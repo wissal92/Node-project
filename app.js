@@ -55,10 +55,43 @@ app.get('/api/v1/tours/:id', (req, res) => {
             tour
         }
     });
-
-
 })
 
+//Put and Patch are both used to update data the difference between them is that
+//with PUT our app receives the entire new updated object. unlike with PATCH
+//which receives only the properties that should be updated on the Object
+
+app.patch('/api/v1/tours/:id', (req, res) => {
+    const id = req.params.id * 1;
+    const found = tours.filter(el => el.id === id); 
+    if(found.length === 0){
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+    res.status(200).json({
+        status: 'success',
+        data: {
+            tour: '<Updated tour here...>'
+        }
+    })
+})
+
+app.delete('/api/v1/tours/:id', (req, res) => {
+    const id = req.params.id * 1;
+    const found = tours.filter(el => el.id === id); 
+    if(found.length === 0){
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+    res.status(204).json({
+        status: 'success',
+        data: null
+    });
+})
 
 const port = 3000;
 app.listen(port, () => {
