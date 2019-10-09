@@ -1,17 +1,35 @@
 const fs = require('fs');
 const express = require('express');
-
+const morgan = require('morgan');
 const app = express();
+
+//********* middlewares ***********/
 
 //this middleware gives us access to data of the body without it req.body would not work
 app.use(express.json());
 
+app.use((req, res, next) => {
+    console.log('Hello from the middleware 👋');
+    next();
+})
+
+app.use((req, res, next) => {
+    req.requestTime= new Date().toISOString();
+    next();
+})
+
+//morgan is a middleware that allow us to log request data in the console
+app.use(morgan('dev'))
 //we write it here because we want it to only gets executed once(right after the app starts up)
 const tours = JSON.parse(fs.readFileSync(__dirname + '/dev-data/data/tours-simple.json'));
 
+//**************** ROUTE HANDLERS *************************/
+
 const getAllTours = (req, res) => {
+    console.log(req.requestTime);
     res.status(200).json({
-      status: 'success', 
+      status: 'success',
+      requestTime: req.requestTime, 
       results: tours.length,
       data: {
         tours
@@ -89,10 +107,12 @@ const deleteTour = (req, res) => {
     });
 };
 
+//**************** ROUTE HANDLERS *************************/
 
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour);
 
+//******************* SERVER ***********************/
 const port = 3000;
 app.listen(port, () => {
     console.log('Server listening on port ' + port);
