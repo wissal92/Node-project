@@ -1,15 +1,75 @@
-         //******************* SERVER CODE **********************/
+const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-//this command will read our variables from config file then save them
-//to nodejs environment variables so we can use them in whatever file we want in ou app
+
 dotenv.config({path: './config.env'});
 
 const app = require('./app');
 
+const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DB_PASSWORD);
 
-//console.log(process.env);
 
-//so we can use the port creared in our config file or 3000
+//the second paramter is just an object with some options to deal with deprecation warnings
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true
+  })
+  .then(con => console.log('DB connection successful :)'))
+  .catch(err => console.log('DB connection failed :('))
+
+//*******************************/
+//        OUR SCHEMAS
+//*******************************/
+
+//when creating schema we could give our parameters a value as the data type
+//or an object if we want more features
+
+const tourSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'A tour must have a name'], //=> we can pass an array if we want to display an error when this field is missing we call it a validator  
+    unique: true
+  },
+  rating: {
+    type: Number,
+    default: 4.5
+  },
+  price: {
+    type: Number,
+    required:[true, 'A tour must have a price'],
+  }
+});
+
+//*********************************/
+//        OUR MODELS
+//*********************************/
+
+//After creating our schemas we can create our models out of it:
+// => A model is like a blueprint that we use to create documents
+
+const Tour = mongoose.model('Tour', tourSchema);
+
+
+//********************************/
+//       OUR DOCUMENTS            
+//********************************/
+
+//We create them out of our models:
+
+const testTour = new Tour({
+  name: 'The Park Camper',
+  price: 876
+});
+
+//and to save in our Tour collection in our database we use: 
+testTour.save().then(doc => console.log(doc))
+               .catch(err => console.log('Error 😢: ', err));
+              
+
+
+//**************************************************************************
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log('Server listening on port ' + port);

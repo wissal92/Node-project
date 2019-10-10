@@ -4,7 +4,7 @@
   "description": "learning node, express, mongodb",
   "main": "app.js",
   "scripts": {
-    "start:dev": "nodemon server.js",
+    "start": "nodemon server.js",
     "start:prod": "SET NODE_ENV=production& nodemon server.js"
   },
   "author": "wissal belkadi",
@@ -12,6 +12,8 @@
   "dependencies": {
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
+    "i": "^0.3.6",
+    "mongoose": "^5.7.4",
     "morgan": "^1.9.1"
   },
   "devDependencies": {
