@@ -1,0 +1,150 @@
+      ***************************************************
+                           MONGODB 
+      ***************************************************
+
++) => Each database can contain one or multiple collections(like tables in relational database)
+   => Each Collection can contain one or more data structure called documents(like rows in relational database)
+   => Each document contains the data about one single entity like(one user/ one post ...etc)
+
+KEY MONGODB FEATURES: 
+
++)DOCUMENT BASED: store data in documents
+
++)SCALABLE: very easy to distribute data across multiple machines as the
+  amount of data grows
+
++)FLEXIBLE: NO document data schema required. Each document can have different
+ number and type of fields
+
++)PERFORMANT
+
++)Free and open source
+
+
+
+***************************************************************************
+
+*)MONGODB: uses a data format similar to JSON FOR data storage called BSON
+    =>BSON looks like JSON but the difference between them is that BSON is typed
+
+*)EMBEDDING/DENORMALIZING: including related data into a single document is
+
+*)BSON DOCUMENTS: => The maximum size for each document is 16MG
+                  => Each document contains a unique id that acts as the 
+                  primary key for that document and it is automatically 
+                  generated
+
+
+****************************************************************************
+
+CREATING LOCAL database
+
+=> We just use 'use nameOfDataBase'
+=> 'use' also can be used to switch to an existing database
+
+EX: use newdata => if newdata base did not exist it will be created
+                   if it already exists it would switch to it.
+
+
+
+***********************************************************************
+
+CREATING A COLLECTION 
+
+We need to create a Collection that will hold our documents and to do that
+we use => ourCurrentDatabase.TheNameOfOurCollection.insertMany({our data})
+
+EX: 
+  db.tours.insertOne({name: "Sea", price: 250, rating: 4.7})
+
+
+
+************************************************************************
+
+CREATING DOCUMENTS:
+
++) => To create more than one document we use insertMany which accepts an array 
+      with multiple objects EX:
+    db.tours.insertMany([{name: "Forest", price: 120, rating 4.8}, 
+                         {name: "Park", price: 300, rating: 4.9, difficulty: "easy"}
+                        ])
+
++) => To create just one document we use insertOne which accepts an object 
+      with our data
+
+
+QUERING(READING)DOCUMENTS: 
+
+db => in here is the name of our current database
+
+*) => the easiest way to query for all our documents : db.ourCollectionName.find()
+      to query the result in a more structured way we use:
+      db.ourCollectionName.find().pretty()
+
+*) => if we only want to get one document and we know its name:
+      db.ourCollectionName.find({name: "the name"})
+
+*) => if we want to get documents based on a condition like price less than 500$:
+      db.ourCollectionName.find({price: {$lt: 500}}) => lt: stands for less than
+      and the $ sign is reserved for mongo operators
+
+ AND SEARCH &&:
+*) => based on two conditions: in this example we want the price to be less than 
+      500$ and tha rating greater than or equal to 4.8:
+      db.ourCollectionName.find({price: {$lt: 500}, rating: {$gte: 4.8}}) => gte means 
+      greater than or equal
+
+OR SEARCH ||:
+*) => we use $or then we create an array and we put in it our conditions where we
+      want one of them to be true. ex:
+      db.ourCollectionName.find({$or [{price: {$gt: 500}}, {rating: {$gte: 4.8}}]})
+      gt => means greater than.
+
+HOW TO PASS AN OBJECT FOR PROJECTION:
+*) => projections: is select some of the fields in the output like outputing
+      just tha name of the user based on some conditions EX:
+      db.ourCollectionName.find({$or [{price: {$gt: 500}}, {rating: {$gte: 4.8}}]}, {name: 1})
+      name = 1 => means that we just want the name for the output.
+
+
+***************************************************************************
+
+UPDATING DOCUMENTS: 
+
+to update documents we have updateOne and updateMany => then we select which 
+document/s => pass the data that will update our document in the set operator
+
+*) => example with updateOne:
+  db.ourCollectionName.updateOne({name: "Green Woods"}, {$set: {price: 597}})
+
+*) => if our query will match multiple documents we should use updateMany EX:
+  db.ourCollectionName.updateMany({price: {$gt: 500}, rating: {$gte: 4.8}}, {$set: {premium: true}})
+
+
+*) => updateMany and updateOne usually update parts of the documents to 
+completely replace the content of the document we could use replaceOne.
+and to use it we just pass the search query then the new data like with 
+updateOne.
+
+
+****************************************************************************
+
+DELETING DOCUMENTS
+
+to delete documents we also have deleteOne to delete one single document
+and deleteMany to delete multiple documents at the same time.
+
+*) => EXAMPLE: delete all documents that have a rating lass than 4.8:
+      db.ourCollectionName.deleteMany({rating: {$lt: 4.8}})
+
+*) => to delete all documents in a collection we just pass to deleteMany an 
+      empty object(it is a condition that means all the document is a match) EX:
+      db.ourCollectionName.deleteMany({})
+      
+
+
+**********************************************************************
+
+USEFUL COMMANDS:
+
+show dbs => shows us all the databases that we have 
