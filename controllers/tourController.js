@@ -14,10 +14,26 @@ exports.getAllTours = async (req, res) => {
         let queryStr = JSON.stringify(queryObj);
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
-        const query = Tour.find(JSON.parse(queryStr));
+        let query = Tour.find(JSON.parse(queryStr));
 
-        //console.log(req.query)
+        //3)Sorting:
+        //we want to sort our documents based on the price(ascending order) but if
+        // we want it in a descending order we just add - before price in our query
+        if(req.query.sort){
+            //query = query.sort(req.query.sort)
 
+            //in case there is a tie we could add another criteria:
+            //we just add it to our query we need to put a comma before it ex:
+            //127.0.0.1:3000/api/v1/tours?sort=-price,ratingsAverage
+            //then in our code to get ride of the comma we write this logic:
+            const sortBy = req.query.sort.split(',').join(' ');
+            query = query.sort(sortBy);
+        } else {
+            query = query.sort('-createdAt');
+        }
+
+       
+        
         //executing the query:
         const tours = await query;
         
