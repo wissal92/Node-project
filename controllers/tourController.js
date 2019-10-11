@@ -2,30 +2,21 @@ const Tour = require('./../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
     try {
-        //to write a query there are 2 ways:
-
-        //ex of a query : ourURL?duration=5&difficulty=easy
-        // => first way:
-        // const tours = await Tour.find({
-        //     duration: 5,
-        //     difficulty: 'easy',
-        // });
-
-        // => second way using mongoose methods:
-        // const tours = await Tour.find()
-        //                        .where('duration')
-        //                        .equals(5)
-        //                        .where('difficulty')
-        //                        .equals('easy');
-        
-        //to implement query filter in our api => :
-        //first to git rid of the inwanted data in our query we use:
-        //building the query:
+        //building the query
+        //1)Filtering:
         const queryObj = {...req.query};
         const excludedFields = ['page', 'sort', 'limit', 'fields'];
         excludedFields.forEach(el => delete queryObj[el]);
+        
+        //2)Advanced filtering:
+        //when using operators in our queries and log res.query we get { duration: { gte: '5' }, difficulty: 'easy' }
+        //to make it work we just need $ in front of our operator and to do that:
+        let queryStr = JSON.stringify(queryObj);
+        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
-        const query = Tour.find(queryObj);
+        const query = Tour.find(JSON.parse(queryStr));
+
+        //console.log(req.query)
 
         //executing the query:
         const tours = await query;
