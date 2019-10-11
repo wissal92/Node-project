@@ -9,29 +9,30 @@ exports.getAllTours = async (req, res) => {
         excludedFields.forEach(el => delete queryObj[el]);
         
         //2)Advanced filtering:
-        //when using operators in our queries and log res.query we get { duration: { gte: '5' }, difficulty: 'easy' }
-        //to make it work we just need $ in front of our operator and to do that:
         let queryStr = JSON.stringify(queryObj);
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
         let query = Tour.find(JSON.parse(queryStr));
 
         //3)Sorting:
-        //we want to sort our documents based on the price(ascending order) but if
-        // we want it in a descending order we just add - before price in our query
         if(req.query.sort){
-            //query = query.sort(req.query.sort)
-
-            //in case there is a tie we could add another criteria:
-            //we just add it to our query we need to put a comma before it ex:
-            //127.0.0.1:3000/api/v1/tours?sort=-price,ratingsAverage
-            //then in our code to get ride of the comma we write this logic:
             const sortBy = req.query.sort.split(',').join(' ');
             query = query.sort(sortBy);
         } else {
             query = query.sort('-createdAt');
         }
 
+        //4)Field Limiting:to allow to API user to only request some of the fields
+        if(req.query.fields){
+            //mongoose only accepts a string of field name separted by spaces in our u
+            //we can have white space that is why add commas to separate our fields
+            const fields = req.query.fields.split(',').join(' ');
+            query = query.select(fields);
+        } else {
+            //to not send some of the added data by moongoose to the client like __v we 
+            //add a minus sign before it
+            query = query.select('-__v');
+        }
        
         
         //executing the query:
