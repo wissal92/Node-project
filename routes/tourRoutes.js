@@ -3,8 +3,6 @@ const tourController = require('./../controllers/tourController');
 const router = express.Router();
 
 //our Alias Route:
-//we call our allTours route but before calling it we create a middlware to specify 
-//what getallTours should gives us instead of all the tours
 router.route('/top-5-cheap').get(tourController.aliasTopTours, tourController.getAllTours)
 
 router
