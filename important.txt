@@ -148,3 +148,14 @@ and deleteMany to delete multiple documents at the same time.
 USEFUL COMMANDS:
 
 show dbs => shows us all the databases that we have 
+
+
+
+
+************************************************************************
+
+EXCLUDING FIELDS: 
+
+=> CAN BE USEFUL WHEN WE HAVE SENSITIVE DATA THAT SHOULD ONLY BE USED INTERNALLY.
+   LIKE PASSWORDS WE SHOULD NEVER EXPOSE THEM TO THE CLIENT SO CAN EXCLUDE THEM
+   IN THE SCHEMA.

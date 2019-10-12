@@ -2,7 +2,7 @@ const Tour = require('./../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
     try {
-        //building the query
+        //********** building the query ***************
         //1)Filtering:
         const queryObj = {...req.query};
         const excludedFields = ['page', 'sort', 'limit', 'fields'];
@@ -22,20 +22,30 @@ exports.getAllTours = async (req, res) => {
             query = query.sort('-createdAt');
         }
 
-        //4)Field Limiting:to allow to API user to only request some of the fields
+        //4)Field Limiting:
         if(req.query.fields){
-            //mongoose only accepts a string of field name separted by spaces in our u
-            //we can have white space that is why add commas to separate our fields
             const fields = req.query.fields.split(',').join(' ');
             query = query.select(fields);
         } else {
-            //to not send some of the added data by moongoose to the client like __v we 
-            //add a minus sign before it
             query = query.select('-__v');
         }
+
+        //5)Pagination:
+        // => limit means the amount of results that we want in our query 
+        // => skip means the amount of results that should be skipped befor querying our data 
+        //EX of a pagination query: page=1&limit=10 => 1-10: page1, 11=>20: page1, 21=>30 page3 
+        const page = req.query.page * 1 || 1;
+        const limit = req.query.limit * 1 || 10;
+        const skip = (page -1) * limit;
        
-        
-        //executing the query:
+        query = query.skip(skip).limit(limit);
+
+        //to handle a request for a page that does not exist we could add this check:
+        if(req.query.page){
+            const numTours = await Tour.countDocuments(); //CountDocuments method returns the number of document that we have in our db 
+            if(skip >= numTours) throw new Error('This page does not exist');
+        }
+        // *************** executing the query **********************
         const tours = await query;
         
         //send response:
