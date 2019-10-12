@@ -1,5 +1,13 @@
 const Tour = require('./../models/tourModel');
 
+//the middleware that would handle aliasing 
+exports.aliasTopTours = async (req, res, next) => {
+     req.query.limit = '5';
+     req.query.sort = '-ratingsAverage,price';
+     req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+     next();
+}
+
 exports.getAllTours = async (req, res) => {
     try {
         //********** building the query ***************
@@ -31,20 +39,20 @@ exports.getAllTours = async (req, res) => {
         }
 
         //5)Pagination:
-        // => limit means the amount of results that we want in our query 
-        // => skip means the amount of results that should be skipped befor querying our data 
-        //EX of a pagination query: page=1&limit=10 => 1-10: page1, 11=>20: page1, 21=>30 page3 
         const page = req.query.page * 1 || 1;
         const limit = req.query.limit * 1 || 10;
         const skip = (page -1) * limit;
        
         query = query.skip(skip).limit(limit);
 
-        //to handle a request for a page that does not exist we could add this check:
         if(req.query.page){
             const numTours = await Tour.countDocuments(); //CountDocuments method returns the number of document that we have in our db 
             if(skip >= numTours) throw new Error('This page does not exist');
         }
+
+        //6)Aliasing: is to provide an alias route to a request that it is poplular
+        //EX: like providing a route for the five best cheap tours => ?limit=5&sort=-ratingsAverage,price
+
         // *************** executing the query **********************
         const tours = await query;
         
