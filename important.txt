@@ -159,3 +159,14 @@ EXCLUDING FIELDS:
 => CAN BE USEFUL WHEN WE HAVE SENSITIVE DATA THAT SHOULD ONLY BE USED INTERNALLY.
    LIKE PASSWORDS WE SHOULD NEVER EXPOSE THEM TO THE CLIENT SO CAN EXCLUDE THEM
    IN THE SCHEMA.
+
+
+*************************************************************************
+
+AGGREGATION PIPELINE:
+
+=> is a MongoDB framework for data aggregation we can manipulate our data in multiple steps:
+we define a pipeline that all documents from a certain collection go through where 
+they are processed step by step in order to transform them into aggregated results.
+EX:
+calcultaing averages, calcultaing minimum and maximum values, distances ...etc
