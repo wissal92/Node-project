@@ -75,9 +75,7 @@ tourSchema.pre('save', function(next){
 });
 
 //QUERY MIDDLEWARE:
-//in this example if the tour is a secret(just for VIP) we don't wanna show it
-//we created here a regular expression because we want this middleware to get run with all the commands that start with find
-tourSchema.pre(/^find/, function(next){ //=> this keyword here will point to the current query not the current document
+tourSchema.pre(/^find/, function(next){ 
     this.find({secretTour: {$ne: true}});
     this.start = Date.now();
     next();
@@ -85,10 +83,16 @@ tourSchema.pre(/^find/, function(next){ //=> this keyword here will point to the
 
 tourSchema.post(/^find/, function(docs, next){
     console.log(`Query took ${Date.now() - this.start} milliseconds!`)
-    console.log(docs);
     next();
 });
 
+//AGGREGATION MIDDLEWARE:
+//in this example we want to exclude the secret tour in tour-stats where we have used aggregation pipeline
+tourSchema.pre('aggregate', function(next){
+    this.pipeline().unshift({$match: {secretTour: {$ne: true}}})
+    console.log(this); //this here is going to point to the current aggregation object
+    next();
+});
 //OUR VIRTUAL PROPERTY:
 tourSchema.virtual('durationWeeks').get(function(){
     return this.duration / 7;

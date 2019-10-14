@@ -194,7 +194,7 @@ also an object for the schema options where wa can add the option to display
 the virtual properties.
 
 *****************************************************************************
-                    MONGOOSE MIDDLWARES
+                    MONGOOSE MIDDLEWARES
 
 
 + Like in express we could also use middlwares in mongoose, to make somthing happen 
@@ -202,8 +202,11 @@ between two events. there four types of middlwares in mongoose:
 document, query, aggregate and model.
 + we can have middlwares running before and after certain events.
 
-1) => DOCUMENT MIDDLWARE: is a middlware that can act on the currently processed document,
+1) => DOCUMENT MIDDLEWARE: is a middlware that can act on the currently processed document,
 we usually use it with the save event.
 
-2) => QUERY MIDDLWARE: is a middlware that allows us to run functions before or after
-a certain query is executed
+2) => QUERY MIDDLEWARE: is a middlware that allows us to run functions before or after
+a certain query is executed.
+
+3) => AGGREGATION MIDDLEWARE: is a middlware that allows us to add hooks befor or after 
+an aggregation happens.
