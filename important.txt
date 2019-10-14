@@ -204,3 +204,6 @@ document, query, aggregate and model.
 
 1) => DOCUMENT MIDDLWARE: is a middlware that can act on the currently processed document,
 we usually use it with the save event.
+
+2) => QUERY MIDDLWARE: is a middlware that allows us to run functions before or after
+a certain query is executed

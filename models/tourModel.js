@@ -57,30 +57,35 @@ const tourSchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
-    startDates: [Date]
+    startDates: [Date],
+    secretTour: {
+        type: Boolean,
+        default: false
+    }
 },{
     //we add this object to add schema options like displaying the virtual properties
     toJSON: {virtuals: true},
     toObject: {virtuals: true}
 });
 
-//DOCUMENT MIDDLEWARE: runs befor .save() and .create() we can act on the data before it is saved to the database
-//slug => is a string that we can put in the url based on some strings like the name
-tourSchema.pre('save', function(next){ // => every middleware function has access to next so if we have more that one middlware on the stack we should use next
-    //console.log(this) //=> it is going to point to the current processed document
+//DOCUMENT MIDDLEWARE:
+tourSchema.pre('save', function(next){
     this.slug = slugify(this.name, {lower: true});
     next();
 });
 
-tourSchema.pre('save', function(next){
-    console.log('Will save document...')
+//QUERY MIDDLEWARE:
+//in this example if the tour is a secret(just for VIP) we don't wanna show it
+//we created here a regular expression because we want this middleware to get run with all the commands that start with find
+tourSchema.pre(/^find/, function(next){ //=> this keyword here will point to the current query not the current document
+    this.find({secretTour: {$ne: true}});
+    this.start = Date.now();
     next();
 });
 
-//post middleware functions are executed after all pre middleware functions are executed
-//that is why we have acces to the finished document:
-tourSchema.post('save', function(doc, next){
-    console.log(doc);
+tourSchema.post(/^find/, function(docs, next){
+    console.log(`Query took ${Date.now() - this.start} milliseconds!`)
+    console.log(docs);
     next();
 });
 
