@@ -192,3 +192,15 @@ the duration in days: we start by defining this virtual property on the tour sch
 in mongoose.schema we can pass not only the object with the schema definition but
 also an object for the schema options where wa can add the option to display 
 the virtual properties.
+
+*****************************************************************************
+                    MONGOOSE MIDDLWARES
+
+
++ Like in express we could also use middlwares in mongoose, to make somthing happen 
+between two events. there four types of middlwares in mongoose:
+document, query, aggregate and model.
++ we can have middlwares running before and after certain events.
+
+1) => DOCUMENT MIDDLWARE: is a middlware that can act on the currently processed document,
+we usually use it with the save event.
