@@ -210,3 +210,19 @@ a certain query is executed.
 
 3) => AGGREGATION MIDDLEWARE: is a middlware that allows us to add hooks befor or after 
 an aggregation happens.
+
+
+*******************************************************************************
+                 DATA VALIDATION WITH MONGOOSE
+
+VALIDATION : is checking if the entered values are in the  right format for each field
+in our document schema, and they have been entered for all the required field.
+EX of validators: 
+  + required
+  + maxlength, minlength (only available on strings)
+  + min,max (only on numbers and dates)
+  + enum => only for strings
+
+SANITIZATION: which ensures that the inputted data is clean(there is no malicious code injected into our database or our app)
+by removing the unwanted characters from the input data => never accept input data coming from
+a user as it is we always need to sanitize it first.
