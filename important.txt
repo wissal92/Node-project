@@ -170,3 +170,25 @@ we define a pipeline that all documents from a certain collection go through whe
 they are processed step by step in order to transform them into aggregated results.
 EX:
 calcultaing averages, calcultaing minimum and maximum values, distances ...etc
+
+******************************************************************************
+
+VIRTUAL PROPERTIES:
+
+=> are fields that we can define on our schema but they will not persist(they will 
+not be saved in the database in order to save us some space). we can use them 
+for fields that can be derived from one another.
+EX: 
+we want the tour duration in weeks instead of days. we could just created from 
+the duration in days: we start by defining this virtual property on the tour schema 
+=> tourShema.virtual('durationWeeks').get(function(){return this.duration / 7})
+                                       ||
+                                       \/
+                                       we need to define the get method because this vertual property
+                                       will be created each time that we get some data out of the database
+                                       and we pass to it a callback function that gives us the wanted results 
+
+*) so to diplay our virtual properties with our other data:
+in mongoose.schema we can pass not only the object with the schema definition but
+also an object for the schema options where wa can add the option to display 
+the virtual properties.
