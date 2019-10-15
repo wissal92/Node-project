@@ -34,13 +34,10 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
 //error handler middleware:
-app.all('*', (req, res, next) => { //=> all : stands for all the verbes instead of defining error handler for each one and the * stand for all urls
+app.all('*', (req, res, next) => { 
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-//global error handler middleware: instead of error handling in each route we create a global error handler
-//to define an error handler middleware function => we give it 4 arguments instead of three whenever
-//express sees a middleware with 4 arguments it will only call it when there is an error
 app.use(GlobaErrorHandler);
 
 module.exports = app;
