@@ -2,6 +2,8 @@
 
 const express = require('express');
 const morgan = require('morgan');
+const AppError = require('./utils/appError');
+const GlobaErrorHandler = require('./controllers/errorController')
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
@@ -31,14 +33,15 @@ app.use((req, res, next) => {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
-//error handler middlware if we reached it that means that it did not get handled
-//by other router(route does not match any defined one).
+//error handler middleware:
 app.all('*', (req, res, next) => { //=> all : stands for all the verbes instead of defining error handler for each one and the * stand for all urls
-    res.status(404).json({
-        status: 'fail',
-        message: `Can't find ${req.originalUrl} on this server!`
-    })
-})
+    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+//global error handler middleware: instead of error handling in each route we create a global error handler
+//to define an error handler middleware function => we give it 4 arguments instead of three whenever
+//express sees a middleware with 4 arguments it will only call it when there is an error
+app.use(GlobaErrorHandler);
 
 module.exports = app;
 
