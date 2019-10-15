@@ -20,10 +20,6 @@ if(process.env.NODE_ENV === 'development'){
 //this middleware serves static files like our html templates and our images from a folder without using a route
 app.use(express.static(`${__dirname}/public`))
 
-app.use((req, res, next) => {
-    console.log('Hello from the middleware 👋');
-    next();
-})
 
 app.use((req, res, next) => {
     req.requestTime= new Date().toISOString();
@@ -35,6 +31,14 @@ app.use((req, res, next) => {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
+//error handler middlware if we reached it that means that it did not get handled
+//by other router(route does not match any defined one).
+app.all('*', (req, res, next) => { //=> all : stands for all the verbes instead of defining error handler for each one and the * stand for all urls
+    res.status(404).json({
+        status: 'fail',
+        message: `Can't find ${req.originalUrl} on this server!`
+    })
+})
 
 module.exports = app;
 

@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon server.js",
-    "start:prod": "SET NODE_ENV=production& nodemon server.js"
+    "start:prod": "SET NODE_ENV=production& nodemon server.js",
+    "debug": "ndb server.js"
   },
   "author": "wissal belkadi",
   "license": "ISC",
@@ -22,7 +23,8 @@
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-react": "^7.16.0"
+    "eslint-plugin-react": "^7.16.0",
+    "ndb": "^1.1.5"
   },
   "engines": {
     "node": ">=10.0.0"

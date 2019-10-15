@@ -237,4 +237,11 @@ which is a function that would return true(there is no error) or false(there is 
 to it a callback function
 
 + if we don't want to write our own validator they are a lot of packages on npm that we can use. 
-=> the most popular library is called validator.
+=> the most popular library is called validator. 
+
+*******************************************************************************
+                        DEBUGGING NODEJS
+
+the best tool to help us debug our node code: is NDB 
+NDB => which stand for Node Debugger is an npm package to install it:
+npm i ndb --save-dev
