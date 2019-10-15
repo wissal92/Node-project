@@ -1,6 +1,19 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
+//*******************/
+//Uncaught exceptions
+//*******************/
+
+//=> are errors (bugs) that occur in our synchronous code but are not handled anywhere 
+//to handle uncaught exceptions we add:
+
+process.on('uncaughtException', err => {
+  console.log('UNCAUGHT EXCEPTION! 💥 Shutting down');
+  console.log(err.name, err.message);
+    process.exit(1);
+});
+
 dotenv.config({path: './config.env'});
 
 const app = require('./app');
@@ -28,10 +41,16 @@ const server = app.listen(port, () => {
 //so to globally handle unhandled rejected promises we add: 
 
 process.on('unhandledRejection', err =>{
+  console.log('UNHANDLED REJECTION! 💥 Shutting down')
   console.log(err.name, err.message)
   //to shut down our app gracefully we start by closing the sever first the we shut down the app  
   server.close(() => { //server.close gives the server the time to finish all the requests that are still pending
     process.exit(1); // => we use it to shut down our app
   })
 });
+
+
+
+
+
 

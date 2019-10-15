@@ -28,7 +28,6 @@ app.use((req, res, next) => {
     next();
 })
 
-
 //this is where we mount ou routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
