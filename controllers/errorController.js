@@ -53,12 +53,13 @@ module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
     
-    if(process.env.NODE_ENV === 'development'){ //=> in development we want to get as much info as we can inlike in production 
+    if(process.env.NODE_ENV === 'development'){ 
         sendErrorDev(err, res);       
-    } else if(process.env.NODE_ENV === 'production') { // => in production we only want the status and msg
-        //handling invalid database errors by transforming the errors that we get from mongoose into an operational error with a friendly msg
+    } else if(process.env.NODE_ENV === 'production') { 
+       
         let error = {...err};
 
+        //handle names with less or more than the number of characters required
         if(error.name === 'CastError') error = handleCastErrorDB(error);
 
         //handle duplicate names error: 
