@@ -5,6 +5,12 @@ const handleCastErrorDB = err  => {
    return new AppError(msg, 400);
 }
 
+const handleDuplicateFieldsDB = err => {
+    const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0]; //=> to match just the text inside quotes which is our name 
+    const msg = `Duplicate fields value: ${value} please use another value!`;
+    return new AppError(msg, 400);
+}
+
 const sendErrorDev = (err, res) =>{
     res.status(err.statusCode).json({
         status: err.status,
@@ -46,7 +52,10 @@ module.exports = (err, req, res, next) => {
         //handling invalid database errors by transforming the errors that we get from mongoose into an operational error with a friendly msg
         let error = {...err};
 
-        if(err.name === 'CastError') error = handleCastErrorDB(error);
+        if(error.name === 'CastError') error = handleCastErrorDB(error);
+
+        //handle duplicate names error: 
+        if(error.code === 11000) error = handleDuplicateFieldsDB(error);
 
        sendErrorProd(error, res);
     }
