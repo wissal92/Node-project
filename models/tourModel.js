@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 //Our Schema:
 const tourSchema = new mongoose.Schema({
@@ -9,7 +10,8 @@ const tourSchema = new mongoose.Schema({
       unique: true,
       trim: true,
       maxlength: [40, 'A tour name must have less or equal then 40 characters'],
-      minlength: [10, 'A tour name must have at least 10 characters']
+      minlength: [10, 'A tour name must have at least 10 characters'],
+      //validate: [validator.isAlpha, 'Tour name must only contain characters'] //=>isAlpha is a built in method in validator library
     },
     slug: String,
     duration: {
@@ -46,7 +48,16 @@ const tourSchema = new mongoose.Schema({
       type: Number,
       required:[true, 'A tour must have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount:{
+        type:Number,
+        //our custom validator if the descount is bigger than the price we get an error
+        validate: {
+            validator: function(val){
+                return val < this.price; //=>this only points to current doc on NEW document creation it would not work on updates
+            },
+            message: 'Descount must be below regular price'
+        }
+    },
     summary: {
         type: String,
         trim: true,
@@ -76,7 +87,7 @@ const tourSchema = new mongoose.Schema({
     toObject: {virtuals: true}
 });
 
-//DOCUMENT MIDDLEWARE:
+//DOCUMENT MIDDLEWARE: only runs on save and create and not on update.
 tourSchema.pre('save', function(next){
     this.slug = slugify(this.name, {lower: true});
     next();

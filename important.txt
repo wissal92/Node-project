@@ -226,3 +226,15 @@ EX of validators:
 SANITIZATION: which ensures that the inputted data is clean(there is no malicious code injected into our database or our app)
 by removing the unwanted characters from the input data => never accept input data coming from
 a user as it is we always need to sanitize it first.
+
+******************
+CUSTOM VALIDATORS 
+******************
+=> when the build in validators are not enough we can create our custom validator
+which is a function that would return true(there is no error) or false(there is an error)
+
++ to specify the validator in our schema we use the validate property then we pass 
+to it a callback function
+
++ if we don't want to write our own validator they are a lot of packages on npm that we can use. 
+=> the most popular library is called validator.
