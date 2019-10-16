@@ -34,14 +34,11 @@ const userSchema = new mongoose.Schema({
     }
 })
 
-//ENCRYPT OUR PASSWORDS: => we sould never save passwords in our database in plain text
+//ENCRYPT OUR PASSWORDS: 
 
-userSchema.pre('save', async function(next){//=> pre runs between getting the data and saving it into the database
-    if(!this.isModified('password')) return next(); //=> because we want to only hash the password when its created or modified
+userSchema.pre('save', async function(next){
+    if(!this.isModified('password')) return next(); 
 
-    //to hash our passwords we will use bcrypt => it is a hashing algorithm that will first salt then hash our passwords
-    //salt: means that a random string will be added to our password so that 2 equal passwords do not generate the same hash 
-    //to use this algorithm we could use bcryptjs package:
     this.password = await bcrypt.hash(this.password, 12); //=> hash password with cost of 12
 
     this.passwordConfirm = undefined; //=>because we don't want it to persist in our database after making sure that it matchs with our password we delete it
