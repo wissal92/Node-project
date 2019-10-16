@@ -1,6 +1,14 @@
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const AppError = require('../utils/appError');
+
+//Create A Json Web Token: 
+const signToken = id => {
+    return jwt.sign({id}, process.env.JWT_SECRET, {
+       expiresIn: process.env.JWT_EXPIRES_IN 
+    });
+};
 
 exports.signup = catchAsync(async (req, res, next) => {
     const newUser = await User.create({
@@ -9,15 +17,9 @@ exports.signup = catchAsync(async (req, res, next) => {
         password: req.body.password, 
         passwordConfirm: req.body.passwordConfirm
     });
-
-    //JSON WEB TOKENS(JWT) => are a stateless solution for authentication, we dont need to store sessions state on the server 
-    //(restful api should always be stateless) how JWT works:
-    //when the user post his username and email to be authenticated => the app checks if user && password exist in our server 
-    //=> a unique JWT is created for each user => this JWT will be send to the client which will store it either in a cookie or local storage
-    //=>now our user is authenticated without leaving any state on the server(JWT will not be saved on the server)
-    const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN  // =>we add it as a securety mesure to log out the user after certain period of time
-    })
+    
+    //create our token:
+    const token = signToken(newUser._id);
 
     res.status(201).json({
         status: 'success',
@@ -25,5 +27,28 @@ exports.signup = catchAsync(async (req, res, next) => {
         data: {
             user: newUser
         }
+    });
+});
+
+exports.login = catchAsync(async (req, res, next) => {
+    const {email, password} = req.body;
+
+    //1)check if email and password exist
+     if(!email || !password){
+        return  next(new AppError('Please provide email and password!', 400))
+     }
+
+    //2)check if user exists && password is correct
+     const user = await User.findOne({email}).select('+password'); //=>because we have deselected password from our fields in our schema so that it will not get sent to the client to use it a gain we need to use select with +
+
+     //correctPassword is defined on authController
+        if(!user || !(await user.correctPassword(password, user.password))) {
+          return next(new AppError('Incorrect email or password', 401))
+     }
+    //3)if eveything ok, send token to client
+    const token = signToken(user._id); 
+    res.status(200).json({
+        status: 'success',
+        token
     });
 });
