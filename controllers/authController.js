@@ -1,3 +1,5 @@
+//it is a built-in promisify function
+const {promisify} = require('util');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const jwt = require('jsonwebtoken');
@@ -15,7 +17,8 @@ exports.signup = catchAsync(async (req, res, next) => {
         name: req.body.name,
         email: req.body.email,
         password: req.body.password, 
-        passwordConfirm: req.body.passwordConfirm
+        passwordConfirm: req.body.passwordConfirm,
+        passwordChangedAt: req.body.passwordChangedAt
     });
     
     //create our token:
@@ -41,7 +44,7 @@ exports.login = catchAsync(async (req, res, next) => {
     //2)check if user exists && password is correct
      const user = await User.findOne({email}).select('+password'); //=>because we have deselected password from our fields in our schema so that it will not get sent to the client to use it a gain we need to use select with +
 
-     //correctPassword is defined on authController
+     //correctPassword is defined on userModel:
         if(!user || !(await user.correctPassword(password, user.password))) {
           return next(new AppError('Incorrect email or password', 401))
      }
@@ -52,3 +55,36 @@ exports.login = catchAsync(async (req, res, next) => {
         token
     });
 });
+
+//this middleware will check if the user is authenticated before accessing the route 
+exports.protect = catchAsync(async (req, res, next) => {
+    //1) Getting token and check if it is there (we usually send our token using an http header with the request)
+    //the token is in authorization property inside our header and sould start with Bearer 
+    let token;
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+        token = req.headers.authorization.split(' ')[2]
+    }
+
+    if(!token){
+        return next(new AppError('You are not logged in! Please log in to get access.', 401))
+    }
+
+    //2)Token Verification => by verifying if the signature is valid and that would tell us if the token is valid or not
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    //3)Check if user still exists
+    const freshUser = await User.findById(decoded.id);
+    if(!freshUser){
+        return next(new AppError('The token belonging to this user does no longer exist.', 401));
+    }
+
+    //4)Check if user changed password after the token was issued
+    if(freshUser.changePasswordAfter(decoded.iat)){
+        return next(new AppError('User recently changed password! Please log in again.', 401));
+    }
+    
+    //Grant access to protected route
+    req.user = freshUser;
+    next();
+
+})
